@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Description</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .product-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            max-width: 900px;
+            margin: auto;
+        }
+        .product-image {
+            width: 50%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .product-details {
+            padding-left: 20px;
+            width: 50%;
+        }
+        .product-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .product-category {
+            color: #6c757d;
+        }
+        .product-description {
+            margin-top: 10px;
+            font-size: 1em;
+        }
+        .product-price {
+            font-size: 2em;
+            color: #ff4500;
+            margin-top: 10px;
+        }
+        .btn-add-to-cart, .btn-back-to-products, .btn-cart {
+            background-color: #ff9900;
+            border-color: #ff9900;
+            color: #fff;
+            font-size: 1em;
+            padding: 10px 20px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        .btn-back-to-products {
+            margin-left: 2px;
+        }
+        .btn-cart {
+            margin-left: 2px;
+        }
+        #adjust-quantity {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="product-card">
+            <div>
+                {% if product.product_image %}
+                    <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                    <p>No image available</p>
+                {% endif %}
+            </div>
+            <div class="product-details">
+                <h1 class="product-title">{{ product.name }}</h1>
+                <p class="product-category">{{ product.category.name }}</p>
+                <p class="product-description">{{ product.desc }}</p>
+                <h4 class="product-price">Price: ₹ {{ product.price }}</h4>
+                <p class="product-availability">Available: {{ product.available_quantity }}</p>
+                <button id="add-to-cart" class="btn-add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+                <div id="adjust-quantity">
+                    <button id="increase-quantity" class="btn btn-secondary">+</button>
+                    <span id="quantity">1</span>
+                    <button id="decrease-quantity" class="btn btn-secondary">-</button>
+                </div>
+                <a href="{% url 'login2' %}" class="btn-back-to-products"> ADD MORE PRODUCT </a>
+                <button class="btn-cart" onclick="location.href='{% url 'view_cart' %}'">Cart</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Get available count from the server
+            var availableCount = {{ product.available_quantity }};
+            var cartItemExists = {{ cart_item.quantity|default:0 }};
+            
+            if (cartItemExists > 0) {
+                $('#add-to-cart').hide();
+                $('#adjust-quantity').show();
+                $('#quantity').text(cartItemExists);
+            } else {
+                $('#add-to-cart').show();
+                $('#adjust-quantity').hide();
+            }
+
+            // Handle Add to Cart button click
+            $('#add-to-cart').on('click', function() {
+                var productId = $(this).data('product-id');
+                $.ajax({
+                    url: '{% url "add_to_cart" product.id %}',
+                    type: 'POST',
+                    data: {
+                        'product_id': productId,
+                        'quantity': 1,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(response) {
+                        $('#add-to-cart').hide();
+                        $('#adjust-quantity').show();
+                        $('#quantity').text(response.quantity);
+                    },
+                    error: function(response) {
+                        alert('Failed to add product to cart.');
+                    }
+                });
+            });
+
+            // Handle Increase Quantity
+            $('#increase-quantity').on('click', function() {
+                var currentQuantity = parseInt($('#quantity').text());
+                if (currentQuantity < availableCount) {
+                    updateCartQuantity(currentQuantity + 1);
+                } else {
+                    alert('Cannot increase quantity beyond available stock.');
+                }
+            });
+
+            // Handle Decrease Quantity
+            $('#decrease-quantity').on('click', function() {
+                var currentQuantity = parseInt($('#quantity').text());
+                if (currentQuantity > 1) {
+                    updateCartQuantity(currentQuantity - 1);
+                } else {
+                    $('#adjust-quantity').hide();
+                    $('#add-to-cart').show();
+                    updateCartQuantity(0);  // Set quantity to 0 to remove from cart
+                }
+            });
+
+            // Function to update cart quantity via AJAX
+            function updateCartQuantity(quantity) {
+                var productId = $('#add-to-cart').data('product-id');
+                $.ajax({
+                    url: '{% url "add_to_cart" product.id %}',
+                    type: 'POST',
+                    data: {
+                        'product_id': productId,
+                        'quantity': quantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(response) {
+                        $('#quantity').text(response.quantity);
+                        if (response.quantity === 0) {
+                            $('#adjust-quantity').hide();
+                            $('#add-to-cart').show();
+                        }
+                    },
+                    error: function(response) {
+                        alert('Failed to update quantity.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+        .quantity-control button {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Shopping Cart</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr id="cart-item-{{ item.id }}" data-available-count="{{ item.product.product_available_count }}">
+                    <td>{{ item.product.name }}</td>
+                    <td class="quantity-control">
+                        <button class="btn btn-secondary btn-decrease" data-id="{{ item.id }}">-</button>
+                        <span id="quantity-{{ item.id }}">{{ item.quantity }}</span>
+                        <button class="btn btn-secondary btn-increase" data-id="{{ item.id }}">+</button>
+                    </td>
+                    <td>${{ item.product.price }}</td>
+                    <td id="total-{{ item.id }}">${{ item.get_total_price }}</td>
+                    <td>
+                        <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger">Remove</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="cart-summary">
+            <h4>Cart Summary</h4>
+            <div class="total-item">
+                <span>Subtotal:</span>
+                <span>${{ total_cost|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span>Delivery Charges:</span>
+                <span>${{ delivery_charge|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span>Platform Fee:</span>
+                <span>${{ platform_fee|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span>Discount:</span>
+                <span>-${{ discount|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span><strong>Grand Total:</strong></span>
+                <span><strong>${{ grand_total|floatformat:2 }}</strong></span>
+            </div>
+            <a href="#" class="btn btn-success mt-3">Proceed to Checkout</a>
+            <a href="{% url 'login2' %}" class="btn btn-secondary mt-3">Continue Shopping</a>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.btn-increase').on('click', function() {
+                const cartItemId = $(this).data('id');
+                const quantitySpan = $(`#quantity-${cartItemId}`);
+                const currentQuantity = parseInt(quantitySpan.text());
+                const availableCount = $(`#cart-item-${cartItemId}`).data('available-count');
+
+                if (currentQuantity < availableCount) {
+                    updateQuantity(cartItemId, currentQuantity + 1);
+                } else {
+                    alert('Cannot increase quantity beyond available stock.');
+                }
+            });
+
+            $('.btn-decrease').on('click', function() {
+                const cartItemId = $(this).data('id');
+                const quantitySpan = $(`#quantity-${cartItemId}`);
+                const currentQuantity = parseInt(quantitySpan.text());
+
+                if (currentQuantity > 1) {
+                    updateQuantity(cartItemId, currentQuantity - 1);
+                }
+            });
+
+            function updateQuantity(cartItemId, newQuantity) {
+                $.ajax({
+                    url: '{% url "view_cart" %}',
+                    type: 'POST',
+                    data: {
+                        'item_id': cartItemId,
+                        'quantity': newQuantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(response) {
+                        $(`#quantity-${cartItemId}`).text(response.quantity);
+                        $(`#total-${cartItemId}`).text(`$${response.total.toFixed(2)}`);
+                    },
+                    error: function() {
+                        alert('Failed to update quantity.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> {% endcomment %}

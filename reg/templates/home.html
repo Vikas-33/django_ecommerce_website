@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>body {
+        background-image: url('{% static 'background.jpeg' %}');
+        background-size:cover;
+        background-position:center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin:0px;
+
+         
+    }
+    .home h1 {
+        color: #FFFFFF;
+        margin-left: 15px;
+    }
+    
+
+
+     
+    
+</style>
+</head>
+<body>
+    <div class="home">
+        <h1>Welcome</h1>
+        <div class="mt-4">
+            <a href="{% url 'signup' %}" class="btn btn-primary btn-lg mr-2">Sign Up</a>
+            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">Log In</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-image: url('{% static 'background.jpeg' %}');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        form {
+            background: linear-gradient(to right, #0f1b2d, #0b1522);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #fff;
+            color: #333;
+        }
+        .form-control[placeholder] {
+            color: #999;
+        }
+        button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        button:hover {
+            opacity: 1;
+        }
+        .cancelbtn {
+            background-color: #f44336;
+        }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .error-messages div {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container">
+            <h1>Add Product</h1>
+            <p>Please fill in this form to add a product.</p>
+            {% if messages %}
+        <div class="error-messages">
+            {% for message in messages %}
+             <div>{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+            <hr>
+            {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                <div class="error-message">
+                    {% for error in field.errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div class="clearfix">
+                <button type="button" class="cancelbtn" onclick="window.location.href='{% url 'index' %}'">Cancel</button>
+                <button type="submit" onclick="window.location.href='{% url 'seller_dashboard' %}'" >Add Product</button>
+            </div>
+        </div>
+    </form>
+</body>
+</html>

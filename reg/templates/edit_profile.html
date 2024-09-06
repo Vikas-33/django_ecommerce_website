@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+
+{% block homebtn %}
+<!-- Sidebar content remains unchanged -->
+{{ block.super }}
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <h2>Edit Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Save changes</button>
+    </form>
+</div>
+{% endblock %}

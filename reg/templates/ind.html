@@ -1,0 +1,56 @@
+{% extends "index.html" %}
+{% block css %} 
+.btn{
+    background-color:#04AA6D
+}
+.sidebar button {
+    width: 80%;
+    padding: 10px;
+    margin: 20px 10%;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.sidebar button:hover {
+    background-color: #e53935;
+}
+
+{% endblock css %}
+ {% block homebtn %}
+ <div class="sidebar" id="sidebar">
+    <a href="{% url 'index' %}">HOME</a>
+    <a href="{% url 'about' %}">ABOUT US</a>
+    <a href="{% url 'contact' %}">CONTACT</a>
+    {% comment %} <a href="{% url 'log_out' %}">LOGOUT</a> {% endcomment %}
+    <button  onclick="location.href='{% url 'log_out' %}'">LOGOUT</button>
+
+ </div>
+
+
+{% endblock homebtn %}
+
+{% block ln %}
+<div class="topnav-right">
+    <span><strong>Welcome </strong>{{ username }}</span>
+    <button class="btn fa fa-shopping-cart" onclick="location.href='{% url 'view_cart' %}'"></button>
+    
+</div>
+{% endblock ln %}
+
+{% block main %}
+{% if messages %}
+    <div class="error-messages">
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock main %}
+
+{% block more %}
+<div class="card-footer bg-transparent border-top-0">
+    <a href="{% url 'product_desc' product.id %}" class="btn btn-dark btn-block">View More</a>
+</div>
+{% endblock %}

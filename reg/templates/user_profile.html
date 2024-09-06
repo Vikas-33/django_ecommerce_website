@@ -1,0 +1,23 @@
+{% extends "index.html" %}
+
+{% block homebtn %}
+<!-- Sidebar content remains unchanged -->
+{{ block.super }}
+{% endblock homebtn %}
+{% block main %}
+<div class="container mt-4">
+    <h2>User Profile</h2>
+    <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+
+    <h3>Order History</h3>
+    <ul>
+        {% for order in order_history %}
+            <li>Order #{{ order.id }} - {{ order.date_ordered }} - {{ order.total }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'edit_profile' %}" class="btn btn-warning">Edit Profile</a>
+</div>
+{% endblock main %}

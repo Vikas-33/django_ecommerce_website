@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .table {
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .table tbody td {
+            text-align: center;
+        }
+
+        .quantity-control button {
+            font-size: 1.2rem;
+            padding: 5px 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+        }
+
+        .quantity-control span {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 0 10px;
+        }
+
+        .cart-summary {
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 1.1rem;
+        }
+
+        .cart-summary h4 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+
+        .cart-summary .total-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .cart-summary .total-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-success, .btn-secondary {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+        }
+
+        .error-message, .error-messages div {
+            color: #e74c3c;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Shopping Cart</h1>
+        {% if messages %}
+            <div class="error-messages">
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr id="cart-item-{{ item.id }}" data-price="{{ item.product.price }}" data-available-count="{{ item.product.available_quantity }}">
+                    <td>{{ item.product.name }}</td>
+                    <td class="quantity-control">
+                        <button class="btn btn-secondary btn-decrease" data-id="{{ item.id }}">-</button>
+                        <span id="quantity-{{ item.id }}">{{ item.quantity }}</span>
+                        <button class="btn btn-secondary btn-increase" data-id="{{ item.id }}">+</button>
+                    </td>
+                    <td>₹{{ item.product.price }}</td>
+                    <td id="total-{{ item.id }}">₹{{ item.get_total_price }}</td>
+                    <td>
+                        <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger">Remove</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="cart-summary">
+            <h4>Cart Summary</h4>
+            <div class="total-item">
+                <span>Subtotal:</span>
+                <span id="subtotal">₹ {{ total_cost|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span>Delivery Charges:</span>
+                <span id="delivery-charge">₹ {{ delivery_charge|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span>Platform Fee:</span>
+                <span id="platform-fee">₹ {{ platform_fee|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span>Discount:</span>
+                <span id="discount"> ₹ {{ discount|floatformat:2 }}</span>
+            </div>
+            <div class="total-item">
+                <span><strong>Grand Total:</strong></span>
+                <span><strong id="grand-total">₹ {{ grand_total|floatformat:2 }}</strong></span>
+            </div>
+            <a href="#" class="btn btn-success mt-3"> Pay </a>
+            <a href="{% url 'login2' %}" class="btn btn-secondary mt-3">Continue Shopping</a>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.btn-increase').on('click', function() {
+                const cartItemId = $(this).data('id');
+                const quantitySpan = $(`#quantity-${cartItemId}`);
+                const currentQuantity = parseInt(quantitySpan.text());
+                const availableCount = $(`#cart-item-${cartItemId}`).data('available-count');
+                const productPrice = parseFloat($(`#cart-item-${cartItemId}`).data('price'));
+
+                if (currentQuantity < availableCount) {
+                    updateQuantity(cartItemId, currentQuantity + 1);
+                } else {
+                    alert('Cannot increase quantity beyond available stock.');
+                }
+            });
+
+            $('.btn-decrease').on('click', function() {
+                const cartItemId = $(this).data('id');
+                const quantitySpan = $(`#quantity-${cartItemId}`);
+                const currentQuantity = parseInt(quantitySpan.text());
+
+                if (currentQuantity > 1) {
+                    updateQuantity(cartItemId, currentQuantity - 1);
+                }
+            });
+
+            function updateQuantity(cartItemId, newQuantity) {
+                $.ajax({
+                    url: '{% url "view_cart" %}',
+                    type: 'POST',
+                    data: {
+                        'item_id': cartItemId,
+                        'quantity': newQuantity,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(response) {
+                        $(`#quantity-${cartItemId}`).text(response.quantity);
+                        $(`#total-${cartItemId}`).text(`₹${response.total.toFixed(2)}`);
+
+                        // Updat cart summary
+                        $('#subtotal').text(`₹ ${response.subtotal.toFixed(2)}`);
+                        $('#delivery-charge').text(`₹ ${response.delivery_charge.toFixed(2)}`);
+                        $('#discount').text(`₹ ${Math.abs(response.discount).toFixed(2)}`);
+                        $('#grand-total').text(`₹ ${response.grand_total.toFixed(2)}`);
+                        $('#platform-fee').text(`₹ ${response.platform_fee.toFixed(2)}`);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        alert('Failed to update quantity.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

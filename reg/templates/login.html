@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            background-image: url('{% static 'background.jpeg' %}');
+            background-size:cover;
+            background-position:center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin:0px;
+
+             
+        }
+
+        form {
+            background: linear-gradient(to right, #0f1b2d, #0b1522);
+            color: white;
+            height:72%;
+            margin-top: -50px;
+            margin-left:200px;
+            padding: 20px;
+            
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            
+        }
+        .home h1 {
+            color: white;
+            text-align: center;
+        }
+        .error-messages {
+            color: red;
+            text-align: left;
+            margin: 10px 0;
+        }
+         
+
+        input[type=text], input[type=password] {
+             width: 100%;
+            padding: 12px 20px;
+            margin: 18px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            opacity: 1.5;
+        }
+
+        .cancelbtn {
+            background-color: #f44336;
+        }
+        
+      
+      
+        .container {
+            padding: 20px;
+        }
+
+        span.psw {
+            float: right;
+            margin:20px;
+            
+        }
+
+        @media screen and (max-width: 300px) {
+            span.psw {
+                display: block;
+                float: none;
+            }
+            .cancelbtn {
+                width: 100%;
+            }
+        }
+    </style>
+    <script>
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted || window.performance && window.performance.navigation.type == 2) {
+                document.querySelector('form').reset();
+            }
+        });
+
+        function redirectToHome() {
+            window.location.href = "{% url 'index' %}";
+        }
+    </script>
+</head>
+<body>
+    
+
+    <form action="{% url 'login' %}" class="home" method="post" >
+        {% csrf_token %}
+        <h1> welcome </h1>
+        {% if messages %}
+        <div class="error-messages">
+            {% for message in messages %}
+             <div>{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+      {% comment %} <div class="image-container">
+          <img src="{% static 'vikas.jpeg' %}" alt="Your Image">
+      </div> {% endcomment %}
+
+        <div class="container">
+            <label for="uname"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="username" required>
+            
+
+
+            <label for="psw"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="password" required>
+            <label>
+                <input type="checkbox" checked="checked" name="remember"> Remember me
+            </label>
+        </div>
+
+        <div class="container">
+            <button type="submit">Login</button>
+            <button type="button" class="cancelbtn" onclick="redirectToHome()">Cancel</button>
+            
+        </div>
+
+         
+            <span class="psw"><a href="#">Forgot password?</a></span>
+        
+    </form>
+</body>
+</html>

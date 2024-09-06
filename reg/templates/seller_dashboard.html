@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard</title>
+    <style>
+        /* Your existing CSS */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #0f1b2d;
+            position: fixed;
+            height: 100%;
+            padding-top: 20px;
+        }
+
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 10px 20px;
+        }
+
+        .cl {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 10px 20px;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #04AA6D;
+            color: white;
+        }
+
+        .cl:hover {
+            background-color: #04AA6D;
+            color: white;
+        }
+
+        .sidebar button {
+            width: 80%;
+            padding: 10px;
+            margin: 20px 10%;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .sidebar button:hover {
+            background-color: #e53935;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .content h1 {
+            margin-top: 0;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 1;
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+        }
+
+        .card p {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+
+        .product-list {
+            margin-top: 40px;
+        }
+
+        .product-list table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .product-list table, .product-list th, .product-list td {
+            border: 1px solid #ddd;
+        }
+
+        .product-list th, .product-list td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        .product-list th {
+            background-color: #f4f4f4;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .error-message, .error-messages div {
+            color: green;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Seller Dashboard</h2>
+        
+        <a class="btn cl btn-outline-danger add-button ms-2" href="{% url 'add_product' %}">ADD NEW PRODUCT</a>
+       
+        <button onclick="window.location.href='{% url 'log_out' %}'">Logout</button>
+    </div>
+
+    <div class="content">
+        <h1>Welcome, {{ user.username }}!</h1>
+        <p>This is your seller dashboard where you can manage your products, view orders, and interact with customers.</p>
+        
+        {% if messages %}
+        <div class="error-messages">
+            {% for message in messages %}
+             <div>{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="cards">
+            <div class="card">
+                <h3>Total Products</h3>
+                <p>{{ total_products }}</p>
+            </div>
+             
+            <div class="card">
+                <h3>Revenue</h3>
+                <p>₹ <!--{{ total_revenue }}--></p> 
+            </div>
+        </div>
+
+        <div class="product-list">
+            <h2>Your Products</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Available Quantity</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr id="product-{{ product.id }}">
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.desc }}</td>
+                            <td>₹{{ product.price }}</td>
+                            <td>{{ product.available_quantity }}</td>
+                            <td>
+                                <a href="{% url 'remove_product' product.id %}" class="btn btn-danger">Remove</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
