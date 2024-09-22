@@ -7,12 +7,17 @@ from .models import *
 from django.http import JsonResponse
 from reg.forms import *
 from .forms import ContactForm
+from django.core.mail import send_mail
+from django.conf import settings
+import random
 
 def signup(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        confirm_password = request.POST['confirm']
+        # Initial Sign-Up Phase
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm')
+        email = request.POST.get('email')
         is_seller = request.POST.get('is_seller', 'off') == 'on'
 
         if User.objects.filter(username=username).exists():
@@ -22,13 +27,60 @@ def signup(request):
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
             return redirect('signup')
-        
-        user = User.objects.create_user(username=username, password=password)
-        user.profile.is_seller = is_seller
-        user.save()
-        return redirect('login')
-    
+
+        # Generate OTP and store it in the session
+        otp = str(random.randint(100000, 999999))
+        request.session['otp'] = otp
+
+        # Send the OTP to the user's email
+        send_mail(
+            'Your OTP for sign-up',
+            f'Your OTP is: {otp}',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+        )
+
+        # Store relevant information in session
+        request.session['username'] = username
+        request.session['password'] = password
+        request.session['email'] = email
+        request.session['is_seller'] = is_seller
+
+        messages.success(request, "OTP has been sent to your email. Please verify.")
+        return redirect('verify_otp')
+
     return render(request, 'signup.html')
+
+def verify_otp(request):
+    if request.method == 'POST':
+        entered_otp = request.POST['otp']
+        # Check the OTP stored in session
+        if 'otp' in request.session and request.session['otp'] == entered_otp:
+            # Create the user after OTP verification
+            username = request.session.get('username')
+            password = request.session.get('password')
+            email = request.session.get('email')
+            is_seller = request.session.get('is_seller')
+
+            user = User.objects.create_user(username=username, password=password, email=email)
+            user.profile.is_seller = is_seller  # Ensure you have this field in your Profile model
+            user.save()
+
+            # Clear the session data
+            del request.session['otp']
+            del request.session['username']
+            del request.session['password']
+            del request.session['email']
+            del request.session['is_seller']
+
+            messages.success(request, "Registration successful. You can now log in.")
+            return redirect('login')  # Adjust according to your flow
+        else:
+            messages.error(request, "Invalid OTP. Please try again.")
+            return redirect('verify_otp')  # Redirect back to OTP verification page
+
+    return render(request, 'verify_otp.html')
 
 def login(request):
     if request.method == 'POST':
@@ -387,4 +439,3 @@ def contact_view(request):
 #     }
     
 #     return render(request, 'cart.html', context)
-

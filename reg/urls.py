@@ -5,6 +5,7 @@ from reg import views
 
 urlpatterns = [
     path('signup/', views.signup, name ="signup"),
+    path('verify-otp/', views.verify_otp, name='verify_otp'), 
     path('', views.index, name="index"),
     path('login/', views.login, name ="login"),
     path('',views.home, name="home"),
@@ -22,7 +23,7 @@ urlpatterns = [
     path('product_desc/<int:product_id>/', views.product_desc, name='product_desc'),
     path('seller_dashboard/', views.seller_dashboard, name='seller_dashboard'),
     path('remove_product/<int:product_id>/', views.remove_product, name='remove_product'),
-    
+        
     
     
 
