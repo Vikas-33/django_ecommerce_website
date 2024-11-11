@@ -1,4 +1,6 @@
-Django E-commerce Platform
+**Django E-commerce Platform**
+
+
 This is a simple Django-based e-commerce application with features for user authentication, product management, and a seller dashboard. The project is designed for educational purposes, demonstrating the core functionalities of a basic e-commerce platform.
 
 Features
