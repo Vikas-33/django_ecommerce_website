@@ -16,7 +16,7 @@ Clone the repository:
 
 bash
 Copy code
-   git clone https://github.com/your-username/your-repo-name.git
+   git clone https://github.com/Vikas-33/django_ecommerce_website.git
 cd your-repo-name
 
 
