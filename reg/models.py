@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Sum, F
+from django.utils.timezone import now
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 
@@ -47,6 +50,38 @@ class CartItem(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_seller = models.BooleanField(default=False)
+    last_login_time=models.DateTimeField(default= now , blank=True, null=True)
+
+    def time_since_last_login(self):
+        if self.last_login_time is None:  # If user never logged in
+            return "Didn't log in yet"
+        diff = now() - self.last_login_time  # Get time difference
+            
+        seconds = diff.total_seconds()
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        
+        # Send email if login is older than 5 minutes
+        # if minutes > 5:
+        #     self.send_inactivity_email(minutes)
+
+        # hours = int(minutes // 60)
+        # minutes = minutes % 60
+
+        return f"{hours}h {minutes}m ago" if hours or minutes else "Just now"
+
+    # def send_inactivity_email(self, minutes):
+    #     subject = "You haven't logged in for a while"
+    #     message = f"Dear {self.user.username},\n\nYou have not logged in for {minutes} minutes. Please log in to keep your account active."
+    #     recipient_list = [self.user.email]
+
+    #     # Send email (you should have email settings configured in your settings.py)
+    #     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+
+    time_since_last_login.short_description = "Time Since Last Login"
+
+    
+    
 
     def __str__(self):
         return self.user.username

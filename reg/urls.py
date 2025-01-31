@@ -23,6 +23,11 @@ urlpatterns = [
     path('product_desc/<int:product_id>/', views.product_desc, name='product_desc'),
     path('seller_dashboard/', views.seller_dashboard, name='seller_dashboard'),
     path('remove_product/<int:product_id>/', views.remove_product, name='remove_product'),
+    path('user_profile/',views.user_profile, name='user_profile'),
+    path('edit_profile/',views.edit_profile, name='edit_profile'),
+    path('change_password/',views.change_password, name='change_password'),
+    
+
         
     
     

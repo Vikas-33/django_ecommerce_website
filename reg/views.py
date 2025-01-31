@@ -10,6 +10,7 @@ from .forms import ContactForm
 from django.core.mail import send_mail
 from django.conf import settings
 import random
+from django.utils.timezone import now
 
 def signup(request):
     if request.method == 'POST':
@@ -89,6 +90,8 @@ def login(request):
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            user.profile.last_login_time = now()  # Update last login time in Profile model
+            user.profile.save()
             auth_login(request, user)
             if user.profile.is_seller:
                 return redirect('seller_dashboard')
@@ -142,7 +145,7 @@ def add_product(request):
         return redirect('index')
 
     if request.method == 'POST':
-        form = productform(request.POST, request.FILES)
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             product = form.save(commit=False) 
             product.seller = request.user  # product to this seller
@@ -152,7 +155,7 @@ def add_product(request):
         else:
             messages.error(request, "Product is not added, try again")
     else:
-        form = productform()
+        form = ProductForm()
 
     return render(request, 'add_product.html', {'form': form})
 
@@ -312,12 +315,62 @@ def contact_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your message has been sent successfully!')
-            return redirect('about')  # Replace 'contact' with your contact page URL name
+            return redirect('contact')  # Replace 'contact' with your contact page URL name
     else:
         form = ContactForm()
     return render(request, 'contact.html', {'form': form})
 
 
+@login_required
+def user_profile(request):
+    if request.user.is_authenticated:
+        time_diffrence = now()-request.user.last_login
+        Minutes_since_last_login = time_diffrence.total_seconds()//60
+    else:
+        hours_since_last_login=None
+    return render (request ,'user_profile.html',{'Minutes_since_last_login':Minutes_since_last_login})
+
+
+def edit_profile(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your message has been sent successfully!')
+            return redirect('about')  # Replace 'contact' with your contact page URL name
+    else:
+        form = ContactForm()
+    return render(request, 'contact.html', {'form': form})
+def change_password(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your message has been sent successfully!')
+            return redirect('about')  # Replace 'contact' with your contact page URL name
+    else:
+        form = ContactForm()
+
+
+#i want that i can see the last logged in time in admin panel in its profile section for this  i already have a profile section but i now want to and the last logged in time and diffrence of curent time and last logged in time in hours in admn panel 
+
+
+
+# @login_required
+# def user_profile(request):
+#     # Get the current logged-in user
+#     user = request.user
+    
+#     # Retrieve the user's order history
+#     order_history = Product.objects.filter(user=user).order_by('-date_ordered')
+    
+#     # Pass the user and order history to the template
+#     context = {
+#         'user': user,
+#         'order_history': order_history,
+#     }
+    
+#     return render(request, 'user_profile.html', context)
 
 
 

@@ -1,15 +1,109 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP</title>
+    <style>
+        body {
+            background-image: url('{% static 'background.jpeg' %}');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        form {
+            background: linear-gradient(to right, #0f1b2d, #0b1522);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .home h1 {
+            color: white;
+            text-align: center;
+        }
+
+        .error-messages {
+            color: red;
+            text-align: left;
+            margin: 10px 0;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 18px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            opacity: 1.5;
+        }
+
+        .cancelbtn {
+            background-color: #f44336;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        span.psw {
+            float: right;
+            margin: 20px;
+        }
+
+        @media screen and (max-width: 300px) {
+            span.psw {
+                display: block;
+                float: none;
+            }
+            .cancelbtn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Verify OTP</h1>
     <form method="POST">
         {% csrf_token %}
-        <label for="otp">Enter OTP</label>
-        <input type="text" name="otp" required>
-        <button type="submit">Verify OTP</button>
+        <h1>Verify OTP</h1>
+        {% if messages %}
+        <div class="error-messages">
+            {% for message in messages %}
+             <div>{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="container">
+            <label for="otp"><b>Enter OTP</b></label>
+            <input type="text" name="otp" required>
+        </div>
+
+        <div class="container">
+            <button type="submit">Verify OTP</button>
+        </div>
     </form>
 </body>
 </html>
