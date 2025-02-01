@@ -16,3 +16,4 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 admin.site.register(Profile)
     
+#example 
