@@ -352,9 +352,6 @@ def change_password(request):
         form = ContactForm()
 
 
-#i want that i can see the last logged in time in admin panel in its profile section for this  i already have a profile section but i now want to and the last logged in time and diffrence of curent time and last logged in time in hours in admn panel 
-
-
 
 # @login_required
 # def user_profile(request):
