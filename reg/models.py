@@ -23,9 +23,11 @@ class Product(models.Model):
     available_quantity = models.PositiveIntegerField(default=0)  # Renamed for clarity
     product_image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
+    print(seller)
     def __str__(self):
         return self.name
-
+    
+    
     
 
 class Cart(models.Model):
