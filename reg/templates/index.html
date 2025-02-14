@@ -122,21 +122,82 @@
             color:pink;
         }http://localhost:8000/
 
-        .card {
-            background: linear-gradient(135deg, maroon, peach);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            width:200px;
-            transition: transform 0.3s, box-shadow 0.3s;
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 50px;  
         }
 
-        .card:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            border: 2px solid pink;
+        .product-item {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            text-align: center;
         }
+
+        .product-card {
+            width: 100%;
+            max-width: 500px; 
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 150px; /* gap between cards */
+        }
+
+
+        .product-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .product-card img {
+            width: 80%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .product-info {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .product-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            color: #e44d26;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .buy-btn {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 20px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .buy-btn:hover {
+            background: #218838;
+        }
+
+
+
 
         .footer {
             background: linear-gradient(45deg, darkgray, black);
@@ -231,31 +292,24 @@
 
             
             
-            <div class="container-fluid mt-4">
-                <div class="row no-gutters justify-content-start" id="productList">
+            <div class="container d-flex justify-content-center">
+                <div class="row">
                     {% for product in products %}
-                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 product-item" data-category="{{ product.category.id }}">
-                        <div class="card h-100">
-                            {% if product.product_image %}
-                                <img src="{{ product.product_image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 150px; object-fit: cover;">
-                            {% else %}
-                                <img class="card-img-top" alt="No image available" style="height: 150px; object-fit: cover;">
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ product.name }}</h5>
-                                <p class="card-text"><b>Category:</b> {{ product.category.name }}</p>
-                                <p class="card-text"><b>Price:</b> ₹{{ product.price }}</p>
+                    <div class="col-md-6 d-flex justify-content-center">
+                        <div class="product-card">
+                            <img src="{{ product.product_image.url }}" alt="{{ product.name }}">
+                            <div class="product-info">
+                                <h3 class="product-title">{{ product.name }}</h3>
+                                <p class="product-price">₹{{ product.price }}</p>
+                                <a href="#" class="buy-btn">Buy Now</a>
                             </div>
-                            {% block more %}
-                            <div class="card-footer bg-transparent border-top-0">
-                                <a href="{% url 'signup' %}" class="btn btn-dark btn-block">View More</a>
-                            </div>
-                            {% endblock more %}
                         </div>
-                    </div>       
+                    </div>
                     {% endfor %}
                 </div>
             </div>
+            
+            
         </main>
 
         <footer class="footer">
