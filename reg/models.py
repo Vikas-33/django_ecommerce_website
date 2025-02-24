@@ -6,6 +6,7 @@ from django.db.models import Sum, F
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.conf import settings
+import os
 
 
 
@@ -26,6 +27,13 @@ class Product(models.Model):
     print(seller)
     def __str__(self):
         return self.name
+    def delete(self, *args, **kwargs):
+        # Delete the product image file before deleting the product
+        if self.product_image:
+            image_path = os.path.join(settings.MEDIA_ROOT, str(self.product_image))
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        super().delete(*args, **kwargs)
     
     
     
